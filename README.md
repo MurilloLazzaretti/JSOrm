@@ -177,6 +177,8 @@ Note that in properties type of tcObject or tcObjectList, you don`t need to info
 All DAO`s classes needs to inherits from TJSOrmDao<"TJSOrmEntity"> where (<"TJSOrmEntity">) is the entity that you will manipulate.
 <b>JSOrm framwework will not produces your SQL commands, this need to be implemented by your self.</b></p>
 
+📚 Example of a DAO class:
+
 ```delphi
 uses
   JSOrm.Dao,
@@ -187,11 +189,13 @@ type
   TDaoPessoa = class(TJSOrmDao<TPessoa>)
   public
     function FindById(const pID : string): TDaoPessoa;
+    function GetAll : TDaoPessoa;
     function Insert(pPessoa : TPessoa): TDaoPessoa;
     function Update(pPessoa : TPessoa): TDaoPessoa;
     function Delete(pPessoa : TPessoa): TDaoPessoa;
   end;
 ```
+🥊 Examples of methods:
 
 ```delphi
 function TDaoPessoa.FindById(const pID: string): TDaoPessoa;
@@ -217,6 +221,27 @@ begin
   Result := Self;
 end;
 ```
+
+```delphi
+function TDaoPessoa.Update(pPessoas: TPessoa): TDaoPessoa;
+var
+  sqlText : string;
+begin
+  FQuery.Close;
+  sqlText := ' UPDATE PESSOA SET ' +
+             ' C_NOME='+QuotedStr(pPessoas.Nome) + ',' +
+             ' C_IDADE='+QuotedStr(pPessoas.Id.ToString)+ ',' +
+             ' C_APELIDO='+QuotedStr(pPessoas.Apelido)+ ',' +
+             ' C_DATA_NSCIMENTO='+QuotedStr(FormatDateTime('YYYY-MM-DD', pPessoas.DataNascimento))+
+             ' WHERE C_ID=' + QuotedStr(pPessoas.Id.ToString);
+  FQuery.SQL.Text := sqlText;
+  FQuery.ExecSQL;
+  UpdateEndereco(pPessoas.Endereco); // implement this procedure as you want. inside this class, in other DAO class, etc..
+  UpdateHabilidades(pPessoas.Habilidades); // implement this procedure as you want. inside this class, in other DAO class, etc..
+  Result := Self;
+end;
+```
+
 ## ✏ Tips 
 To have a code easy to write, in all methods of the DAO class return itself. This will make things easier
 
