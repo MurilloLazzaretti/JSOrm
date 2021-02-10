@@ -1,4 +1,4 @@
-## JSOrm
+## JSOrm 🇧🇷 
 
 <p align="center">
   <b>JSOrm</b> is a framework for manipulating relational objects that can be provided by a data base connection (MSSSQL for now) and export / import to a <b>JSON<b> format.
@@ -67,6 +67,8 @@ type
     procedure SetNome(const Value: string);
     procedure SetDataNascimento(const Value: TDate);
   public
+    [TEntityFieldAttributes('C_ID', tcInteger)]
+    property Id: integer read FId write SetId;  
     [TEntityFieldAttributes('C_NOME', tcString)]
     property Nome : string read FNome write SetNome;
     [TEntityFieldAttributes('C_IDADE', tcInteger)]
@@ -77,8 +79,8 @@ type
     property DataNascimento : TDate read FDataNascimento write SetDataNascimento;
   end;
 ```
-
-_Complex entity`s relationship :_
+ 
+_Complex entity`s relationship 💙 :_
 
 ```delphi
 uses
@@ -133,6 +135,8 @@ type
     procedure SetEndereco(const Value: TEndereco);
     procedure SetHabilidades(const Value: TJSOrmEntityList<THabilidade>);
   public
+    [TEntityFieldAttributes('C_ID', tcInteger)]
+    property Id: integer read FId write SetId;
     [TEntityFieldAttributes('C_NOME', tcString)]
     property Nome : string read FNome write SetNome;
     [TEntityFieldAttributes('C_IDADE', tcInteger)]
@@ -160,10 +164,101 @@ TEntityFieldAttributes parameters are the name of your field in your database an
 |  tcObject       | 
 |  tcObjectList   | 
 
-## ⚠️ Atention
+## ⚠️ Warning
 
 Note that in properties type of tcObject or tcObjectList, you don`t need to inform the entity field name because this is a virtual relationship
 
 ## 🌱 Implementing your DAO layer`s
 
+The DAO`s layer is responsable to connect to your database, execute your SQL commands and export the dataset to an object entity or an object list entity.
+All DAO`s classes needs to inherits from TJSOrmDao<TJSOrmEntity> where ("<TJSOrmEntity>") is the entity that you will manipulate.
+<b>JSOrm framwework will not produces your SQL commands, this need to be implemented by your self.</b>
 
+```delphi
+uses
+  JSOrm.Dao,
+  Generics.Collections;
+
+type
+  TDaoPessoa = class(TJSOrmDao<TPessoa>)
+  public
+    function FindById(const pID : string): TDaoPessoa;
+    function Insert(pPessoa : TPessoa): TDaoPessoa;
+    function Update(pPessoa : TPessoa): TDaoPessoa;
+    function Delete(pPessoa : TPessoa): TDaoPessoa;
+  end;
+```
+
+```delphi
+function TDaoPessoa.FindById(const pID: string): TDaoPessoa;
+var
+  sqlText : string;
+begin
+  FQuery.Close;
+  sqlText := ' SELECT * FROM PESSOA' +
+             ' WHERE C_ID=' + QuotedStr(pID);
+  FQuery.Open(sqlText);
+  Result := Self;
+end;
+```
+
+```delphi 
+function TDaoPessoa.GetAll: TDaoPessoa;
+var
+  sqlText : string;
+begin
+  FQuery.Close;
+  sqlText := ' SELECT * FROM PESSOA';
+  FQuery.Open(sqlText);
+  Result := Self;
+end;
+```
+## ✏ Tips 
+To have a code easy to write, in all methods of the DAO class return itself. This will make things easier
+
+## 🌐  Consuming your DAO layer
+
+Working with only one object
+
+```delphi
+var
+  Dao : TDaoPessoa;
+  Pessoa : TPessoa;
+  JSON : TJSONObject;
+begin
+  Dao := TDaoPessoa.Create;
+  try
+    Pessoa := Dao.FindById('id of the pessoa entity in your data base').AsObject;
+    if Assigned(Pessoa) then
+    begin
+      JSON := Pessoa.ToJsonObject;
+      Pessoa.Free;
+    end
+    else
+      raise Exception.Create('Id not found');
+  finally
+    Dao.Free;
+  end;
+end;
+```
+
+Working with an object list
+
+```delphi
+var
+  Dao : TDaoPessoa;
+  Pessoas : TJSOrmEntityList<TPessoa>;
+  JSON : TJSONArray;
+begin
+  Dao := TDaoPessoa.Create;
+  try
+    Pessoas := Dao.GetAll.AsObjectList;
+    JSON := Pessoas.ToJsonArray;
+    Pessoas.Free;
+  finally
+    Dao.Free;
+  end;
+end;
+```
+## ✏ Tips 
+When you call the method AsObject in your DAO class, the method will return <b>the first line of the Query</b> as an object of the configured entity. When you call the method AsObjectList, the methos will return an object list with all the lines in your Query. If the query is empty, this two methods will return NIL.
