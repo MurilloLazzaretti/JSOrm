@@ -1,4 +1,4 @@
-## JSOrm 🇧🇷 
+## JSOrm - Framework 🇧🇷 
 
 <p align="center">
   <b>JSOrm</b> is a framework for manipulating relational objects that can be provided by a data base connection (MSSSQL for now) and export / import to a <b>JSON<b> format.
@@ -261,4 +261,28 @@ begin
 end;
 ```
 ## ✏ Tips 
-When you call the method AsObject in your DAO class, the method will return <b>the first line of the Query</b> as an object of the configured entity. When you call the method AsObjectList, the methos will return an object list with all the lines in your Query. If the query is empty, this two methods will return NIL.
+When you call the method AsObject in your DAO class, the method will return <b>the first line of the Query</b> as an object of the configured entity. When you call the method AsObjectList, the methos will return an object list with all the lines in your Query. If the query is empty, the AsObject method will return nil, for the method AsObjectList, will return an object list with no items.
+
+## 👽 Converting JSON object to your entity
+
+```delphi
+var
+  Pessoa : TPessoa;
+  JSON : TJSONObject;
+begin
+  JSON := 'YOUR JSON OBJECT';
+  try
+    Pessoa := TPessoa.New<TPessoa>(JSON);
+    if Assigned(Pessoa) then
+    begin
+      // Do what ever you want with your entity, insert, update, delete, etc....
+    end
+    else
+      raise Exception.Create('Fail to load your JSON object in TPessoa');
+  finally
+    JSON.Free;
+  end;
+end;
+```
+## ✏ Tips 
+If your entity has a complex relationship and your JSON doesn`t have this informations, the New method will return an instantiated object with all properties assigned, even that properties is an object list.
