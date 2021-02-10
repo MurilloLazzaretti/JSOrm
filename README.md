@@ -1,4 +1,4 @@
-## JSOrm - Framework 🇧🇷 
+## 🇧🇷  JSOrm - Framework 🇧🇷 
 
   <b>JSOrm</b> is a framework for manipulating relational objects that can be provided by a data base connection (MSSQL for now) and export / import to a <b>JSON<b> format.
 
