@@ -170,9 +170,9 @@ Note that in properties type of tcObject or tcObjectList, you don`t need to info
 
 ## 🌱 Implementing your DAO layer`s
 
-The DAO`s layer is responsable to connect to your database, execute your SQL commands and export the dataset to an object entity or an object list entity.
+<p>The DAO`s layer is responsable to connect to your database, execute your SQL commands and export the dataset to an object entity or an object list entity.
 All DAO`s classes needs to inherits from TJSOrmDao<TJSOrmEntity> where ("<TJSOrmEntity>") is the entity that you will manipulate.
-<b>JSOrm framwework will not produces your SQL commands, this need to be implemented by your self.</b>
+<b>JSOrm framwework will not produces your SQL commands, this need to be implemented by your self.</b></p>
 
 ```delphi
 uses
