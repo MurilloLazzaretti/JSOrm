@@ -1,0 +1,9 @@
+{
+	"name": "JSOrm",
+	"description": "Framework for manipulating relational objects with import and export in JSON format and Data Base connection.",
+	"version": "1.0.0",
+	"homepage": "https://github.com/MurilloLazzaretti/jsorm.git",
+	"mainsrc": "src/",
+	"projects": [],
+	"dependencies": {}
+}
