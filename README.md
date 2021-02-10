@@ -19,7 +19,7 @@ You need to <b>start</b> JSOrm providing "ini file name" and "section name" that
 uses JSOrm.Core;
 
 begin  
-  TJSOrm.Start('Your iniFileName', 'Your IniSectionName');    
+  TJSOrm.Start('Connection.ini', 'CONNECTION');    
 end;
 
 ```
@@ -28,7 +28,7 @@ end;
 Note: The ini file needs to be under your application`s path or in Windows Directory (Ex: "C:\Windows\iniFile.ini")
 
 ```iniFile
-[SECTIONNAME]
+[CONNECTION]
 DATABASE=MSSQL
 SERVERNAME= Your database server (Ex: "localhost\SQLEXPRESS")
 DATABASENAME= Your database name
