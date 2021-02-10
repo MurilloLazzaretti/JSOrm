@@ -1,5 +1,4 @@
-# jsorm
- Framework for manipulating relational objects with import and export in JSON format and Data Base connection.
+## JSOrm
 
 <p align="center">
   <b>JSOrm</b> is a framework for manipulating relational objects that can be provided by a data base connection (MSSSQL for now) and export / import to a <b>JSON<b> format.
@@ -26,14 +25,15 @@ end;
 
 Note: The ini file needs to be under your application`s path or in Windows Directory (Ex: "C:\Windows\iniFile.ini")
 
-| ------------------------------------------------------------------- |
+```iniFile
 [SECTIONNAME]
 DATABASE=MSSQL
 SERVERNAME= Your database server (Ex: "localhost\SQLEXPRESS")
 DATABASENAME= Your database name
 USERNAME= Database username
 PASSWORD= Database password
-| ------------------------------------------------------------------- |
+```
+
 ## ⚡️ Don`t forget
 
 When you will terminate your application, dont`t forget to <b>stop</b> JSOrm
