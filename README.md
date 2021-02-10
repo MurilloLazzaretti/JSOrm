@@ -1,6 +1,10 @@
 ## JSOrm - Framework 🇧🇷 
 
-  <b>JSOrm</b> is a framework for manipulating relational objects that can be provided by a data base connection (MSSSQL for now) and export / import to a <b>JSON<b> format.
+  <b>JSOrm</b> is a framework for manipulating relational objects that can be provided by a data base connection (MSSQL for now) and export / import to a <b>JSON<b> format.
+
+## 🐎 Horse compatible
+
+This framework is compatible with [`Horse`](https://github.com/HashLoad/horse) framework from HashLoad.
 
 ## ⚙️ Installation
 
