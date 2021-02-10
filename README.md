@@ -153,18 +153,19 @@ type
     property Habilidades : TJSOrmEntityList<THabilidade> read FHabilidades write SetHabilidades;
   end;
 ```
+## 🔥 TEntityFieldAttributes 
 
-TEntityFieldAttributes parameters are the name of your field in your database and the type of it.
+Parameters are the name of your field in your database and the type of it.
 
-| Supported Types | 
-| --------------- | 
-|  tcString       | 
-|  tcInteger      | 
-|  tcFloat        | 
-|  tcDateTime     | 
-|  tcDate         | 
-|  tcObject       | 
-|  tcObjectList   | 
+| _Supported Types_ | _Value_  | _DataBase Name_ | 
+| ----------------- | -------- | --------------- |
+|  tcString         | Text     | ✔️
+|  tcInteger        | Number   | ✔️
+|  tcFloat          | Number   | ✔️
+|  tcDateTime       | DateTime | ✔️
+|  tcDate           | Date     | ✔️
+|  tcObject         | Virtual  | ❌
+|  tcObjectList     | Virtual  | ❌
 
 ## ⚠️ Warning
 
