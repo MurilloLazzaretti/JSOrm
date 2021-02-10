@@ -4,7 +4,7 @@
 
 ## 🐎 Horse compatible
 
-This framework is compatible with [`Horse`](https://github.com/HashLoad/horse) framework from HashLoad.
+JSOrm is compatible with [`Horse`](https://github.com/HashLoad/horse) framework from [`HashLoad`](https://github.com/HashLoad).
 
 ## ⚙️ Installation
 
