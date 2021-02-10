@@ -50,7 +50,7 @@ end;
 
 All of your entity`s need to inherits from TJSOrmEntity and your properties decorated by TEntityFieldAttributes.
 
-_Simple entity :_
+🦴 _Simple entity:_
 
 ```delphi
 uses
@@ -82,7 +82,7 @@ type
   end;
 ```
  
-_Complex entity`s relationship 💙 :_
+💙 _Complex entity`s relationship:_
 
 ```delphi
 uses
@@ -159,13 +159,13 @@ Parameters are the name of your field in your database and the type of it.
 
 | _Supported Types_ | _Value_  | _DataBase Name_ | 
 | ----------------- | -------- | --------------- |
-|  tcString         | Text     | ✔️
-|  tcInteger        | Number   | ✔️
-|  tcFloat          | Number   | ✔️
-|  tcDateTime       | DateTime | ✔️
-|  tcDate           | Date     | ✔️
-|  tcObject         | Virtual  | ❌
-|  tcObjectList     | Virtual  | ❌
+|  tcString         | Text     | ✔️               |
+|  tcInteger        | Number   | ✔️               |
+|  tcFloat          | Number   | ✔️               |
+|  tcDateTime       | DateTime | ✔️               |
+|  tcDate           | Date     | ✔️               |
+|  tcObject         | Virtual  | ❌              |
+|  tcObjectList     | Virtual  | ❌              |
 
 ## ⚠️ Warning
 
