@@ -247,7 +247,7 @@ To have a code easy to write, in all methods of the DAO class return itself. Thi
 
 ## 🌐  Consuming your DAO layer
 
-Working with only one object
+🚲  Working with only one object
 
 ```delphi
 var
@@ -271,7 +271,7 @@ begin
 end;
 ```
 
-Working with an object list
+🚌  Working with an object list
 
 ```delphi
 uses
