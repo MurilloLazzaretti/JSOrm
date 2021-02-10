@@ -4,7 +4,7 @@
 
 ## 🐎 Horse compatible
 
-JSOrm is compatible with [`Horse`](https://github.com/HashLoad/horse) framework from [`HashLoad`](https://github.com/HashLoad).
+JSOrm is compatible with [`Horse`](https://github.com/HashLoad/horse) framework from [`HashLoad`](https://github.com/HashLoad), but do not confuse, this is not a Middleware.
 
 ## ⚙️ Installation
 
@@ -180,6 +180,7 @@ All DAO`s classes needs to inherits from TJSOrmDao<"TJSOrmEntity"> where (<"TJSO
 ```delphi
 uses
   JSOrm.Dao,
+  Pessoa,
   Generics.Collections;
 
 type
@@ -248,6 +249,10 @@ end;
 Working with an object list
 
 ```delphi
+uses
+  JSOrm.Entity,
+  Generics.Collections;
+
 var
   Dao : TDaoPessoa;
   Pessoas : TJSOrmEntityList<TPessoa>;
