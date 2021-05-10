@@ -9,7 +9,8 @@ function ISOTimeStampToDateTime(const dateTime: string): TDateTime;
 function ISODateToDate(const date: string): TDate;
 function DateTimeToISOTimeStamp(const dateTime: TDateTime): string;
 function DateToISODate(const date: TDateTime): string;
-function VariantArrayToJSONArray(const pVariantArray : Variant) : TJSONArray;
+function ArrayToJSONArray(const pArray : TArray<string>) : TJSONArray; overload;
+function ArrayToJSONArray(const pArray : TArray<integer>) : TJSONArray; overload;
 
 implementation
 
@@ -19,15 +20,22 @@ uses
   System.DateUtils,
   System.Rtti;
 
-function VariantArrayToJSONArray(const pVariantArray : Variant) : TJSONArray;
+function ArrayToJSONArray(const pArray : TArray<integer>) : TJSONArray; overload;
 var
-  Length : integer;
   I: Integer;
 begin
   Result := TJSONArray.Create;
-  Length := VarArrayHighBound(pVariantArray, 1);
-  for I := 0 to Length -1 do
-    Result.AddElement(TJSONString.Create(pVariantArray[i]));
+  for I := 0 to Length(pArray) -1 do
+    Result.AddElement(TJSONNumber.Create(pArray[i]));
+end;
+
+function ArrayToJSONArray(const pArray : TArray<string>) : TJSONArray;
+var
+  I: Integer;
+begin
+  Result := TJSONArray.Create;
+  for I := 0 to Length(pArray) -1 do
+    Result.AddElement(TJSONString.Create(pArray[i]));
 end;
 
 function ISOTimeStampToDateTime(const dateTime: string): TDateTime;

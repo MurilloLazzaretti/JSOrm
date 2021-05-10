@@ -7,7 +7,7 @@ uses
 
 type
   TEntityFieldType = (tcString, tcInteger, tcFloat, tcDateTime, tcDate,
-    tcArray, tcObject, tcObjectList);
+    tcArrayString, tcArrayInteger, tcObject, tcObjectList);
 
   TEntityFieldAttributes = class(TCustomAttribute)
   private
