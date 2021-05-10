@@ -15,7 +15,6 @@ type
     procedure SetPassword(const Value: string);
     procedure SetServer(const Value: string);
     procedure SetUser(const Value: string);
-    function Cript(const pValue : string) : string;
   public
     property Driver : string read FDriver write SetDriver;
     property Server : string read FServer write SetServer;
@@ -65,17 +64,6 @@ begin
   end
   else
     raise Exception.Create('Inifile not found');
-end;
-
-function TJSOrmConnectionParams.Cript(const pValue: string): string;
-var
-  i: integer;
-begin
-	Result := '';
-  for i := 1 to length(pValue) do
-  begin
-    result := result + char(byte(11010) xor byte(pValue[i]));
-  end;
 end;
 
 procedure TJSOrmConnectionParams.SetDataBase(const Value: string);
