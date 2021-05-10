@@ -57,8 +57,8 @@ begin
       Driver := IniFile.ReadString(pIniSection, 'DATABASE', 'MSSQL');
       Server := IniFile.ReadString(pIniSection, 'SERVERNAME', 'LOCALHOST/SQLEXPRESS');
       DataBase := IniFile.ReadString(pIniSection, 'DATABASENAME', '');
-      User := Cript(IniFile.ReadString(pIniSection, 'USERNAME', 'sa'));
-      Password := Cript(IniFile.ReadString(pIniSection, 'PASSWORD', ''));
+      User := IniFile.ReadString(pIniSection, 'USERNAME', '');
+      Password := IniFile.ReadString(pIniSection, 'PASSWORD', '');
     finally
       IniFile.Free;
     end;
