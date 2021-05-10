@@ -6,7 +6,8 @@ uses
   JSOrm.Entity;
 
 type
-  TEntityFieldType = (tcString, tcInteger, tcFloat, tcDateTime, tcDate, tcObject, tcObjectList);
+  TEntityFieldType = (tcString, tcInteger, tcFloat, tcDateTime, tcDate,
+    tcArray, tcObject, tcObjectList);
 
   TEntityFieldAttributes = class(TCustomAttribute)
   private

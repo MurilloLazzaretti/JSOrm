@@ -12,17 +12,19 @@ uses
 type
   TJSOrmRtti = class
   private
+//    class procedure ParseRecordDataSet(const pSource : TDataSet; var pEntity : TJSOrmEntity); overload;
     class function FindClassType(const ClassName : string) : TRttiType;
     class function FindClassTypeList(const ClassName : string) : TRttiType;
     class function ParseJsonObject(const pSource : TJSONObject; const pEntityClassName : string) : TJSOrmEntity; overload;
-    class function ParseJsonArray(const pSource : TJSONArray; const pEntityClassName : string) : TJSOrmEntityList<TJSOrmEntity>;
+    class function ParseJsonArray(const pSource : TJSONArray; const pEntityClassName : string) : TJSOrmEntityList<TJSOrmEntity>; overload;
+    class function ParseJsonArray(const pSource : TJSONArray) : TArray<TValue>; overload;
   public
     class function New<T : TJSOrmEntity> : T; overload;
     class procedure CreateFieldsObject(const pEntity : TJSOrmEntity);
     class procedure DestroyFieldsObject(const pEntity : TJSOrmEntity);
     class function ParseJsonObject<T : class>(const pSource : TJSONObject) : T; overload;
     class function ParseDataSet<T : TJSOrmEntity>(const pSource : TDataSet) : TJSOrmEntityList<T>;
-    class function ParseRecordDataSet<T : class>(const pSource : TDataSet) : T;
+    class function ParseRecordDataSet<T : class>(const pSource : TDataSet) : T; overload;
     class function ToJsonObject(const pEntity : TJSOrmEntity): TJSONObject;
     class function ToJsonArray(const pEntity : TJSOrmEntityList<TJSOrmEntity>) : TJSONArray;
   end;
@@ -159,6 +161,7 @@ var
   Attribute: TCustomAttribute;
   Entity : TJSOrmEntity;
   Meth: TRttiMethod;
+  //ObjEntity, ObjEntityList : TObject;
 begin
   Context := TRttiContext.Create;
   try
@@ -193,6 +196,12 @@ begin
                 TypProp := FindClassType(Prop.PropertyType.ToString);
                 Meth := TypProp.GetMethod('Create');
                 Prop.SetValue(TObject(Entity), Meth.Invoke(TypProp.AsInstance.MetaclassType, []));
+
+//                TypProp := FindClassType(Prop.PropertyType.ToString);
+//                Meth := TypProp.GetMethod('Create');
+//                ObjEntity := Meth.Invoke(TypProp.AsInstance.MetaclassType, []).AsObject;
+//                ParseRecordDataSet(pSource, TJSOrmEntity(ObjEntity));
+//                Prop.SetValue(TObject(Entity), ObjEntity);
               end;
             tcObjectList:
               if Prop.GetValue(TObject(Entity)).IsEmpty then
@@ -200,6 +209,10 @@ begin
                 TypProp := FindClassType(Prop.PropertyType.ToString);
                 Meth := TypProp.GetMethod('Create');
                 Prop.SetValue(TObject(Entity), Meth.Invoke(TypProp.AsInstance.MetaclassType, [True]));
+
+//                TypProp := FindClassType(Prop.PropertyType.ToString);
+//                Meth := TypProp.GetMethod('Create');
+//                ObjEntityList := Meth.Invoke(TypProp.AsInstance.MetaclassType, []).AsObject;
               end;
           end;
         end;
@@ -248,6 +261,8 @@ begin
                 Prop.SetValue(Entity, TValue.FromVariant(ISOTimeStampToDateTime(TJSONObject(pSource.Items[i]).GetValue(Prop.Name).Value)));
               tcDate:
                 Prop.SetValue(Entity, TValue.FromVariant(ISODateToDate(TJSONObject(pSource.Items[i]).GetValue(Prop.Name).Value)));
+              tcArray:
+                Prop.SetValue(Entity, TValue.FromArray(Prop.PropertyType.Handle, ParseJsonArray(TJSONObject(pSource.Items[i]).GetValue(Prop.Name) as TJSONArray)));
               tcObject:
                 Prop.SetValue(Entity, ParseJsonObject(TJSONObject(pSource.Items[i]).GetValue(Prop.Name) as TJSONObject, Prop.PropertyType.ToString));
               tcObjectList:
@@ -260,6 +275,18 @@ begin
         end;
       end;
     end;
+  end;
+end;
+
+class function TJSOrmRtti.ParseJsonArray(
+  const pSource: TJSONArray): TArray<TValue>;
+var
+  I: Integer;
+begin
+  SetLength(Result, pSource.Count);
+  for I := 0 to Pred(pSource.Count) do
+  begin
+    Result[i] := TValue.FromVariant(pSource.Items[i].Value);
   end;
 end;
 
@@ -289,6 +316,8 @@ begin
             Prop.SetValue(TObject(Result), TValue.FromVariant(ISOTimeStampToDateTime(pSource.GetValue(Prop.Name).Value)));
           tcDate:
             Prop.SetValue(TObject(Result), TValue.FromVariant(ISODateToDate(pSource.GetValue(Prop.Name).Value)));
+          tcArray:
+            Prop.SetValue(TObject(Result), TValue.FromArray(Prop.PropertyType.Handle, ParseJsonArray(pSource.GetValue(Prop.Name) as TJSONArray)));
           tcObject:
             Prop.SetValue(TObject(Result), ParseJsonObject(pSource.GetValue(Prop.Name) as TJSONObject, Prop.PropertyType.ToString));
           tcObjectList:
@@ -330,6 +359,8 @@ begin
               Prop.SetValue(TObject(Result), TValue.FromVariant(ISOTimeStampToDateTime(pSource.GetValue(Prop.Name).Value)));
             tcDate:
               Prop.SetValue(TObject(Result), TValue.FromVariant(ISODateToDate(pSource.GetValue(Prop.Name).Value)));
+            tcArray:
+              Prop.SetValue(TObject(Result), TValue.FromArray(Prop.PropertyType.Handle, ParseJsonArray(pSource.GetValue(Prop.Name) as TJSONArray)));
             tcObject:
               Prop.SetValue(TObject(Result), ParseJsonObject(pSource.GetValue(Prop.Name) as TJSONObject, Prop.PropertyType.ToString));
             tcObjectList:
@@ -345,6 +376,65 @@ begin
     Context.Free;
   end;
 end;
+
+//class procedure TJSOrmRtti.ParseRecordDataSet(const pSource: TDataSet;
+//  var pEntity: TJSOrmEntity);
+//var
+//  Context : TRttiContext;
+//  TypObj : TRttiType;
+//  Prop: TRttiProperty;
+//  Attribute: TCustomAttribute;
+//begin
+//  Context := TRttiContext.Create;
+//  try
+//    TypObj := Context.GetType(pEntity.ClassInfo);
+//    for Prop in TypObj.GetProperties do
+//    begin
+//      for Attribute in Prop.GetAttributes do
+//      begin
+//        case TEntityFieldAttributes(Attribute)._Type of
+//          tcString:
+//            if not pSource.FindField(TEntityFieldAttributes(Attribute)._Name).IsNull then
+//              Prop.SetValue(TObject(pEntity), TValue.From<string>(pSource.FindField(TEntityFieldAttributes(Attribute)._Name).Value));
+//          tcInteger:
+//            if not pSource.FindField(TEntityFieldAttributes(Attribute)._Name).IsNull then
+//              Prop.SetValue(TObject(pEntity), TValue.From<integer>(pSource.FindField(TEntityFieldAttributes(Attribute)._Name).Value));
+//          tcFloat:
+//            if not pSource.FindField(TEntityFieldAttributes(Attribute)._Name).IsNull then
+//              Prop.SetValue(TObject(pEntity), TValue.From<double>(pSource.FindField(TEntityFieldAttributes(Attribute)._Name).Value));
+//          tcDateTime:
+//            if not pSource.FindField(TEntityFieldAttributes(Attribute)._Name).IsNull then
+//              Prop.SetValue(TObject(pEntity), TValue.From<TDateTime>(pSource.FindField(TEntityFieldAttributes(Attribute)._Name).Value));
+//          tcDate:
+//            if not pSource.FindField(TEntityFieldAttributes(Attribute)._Name).IsNull then
+//              Prop.SetValue(TObject(pEntity), TValue.From<TDate>(pSource.FindField(TEntityFieldAttributes(Attribute)._Name).Value));
+//        end;
+//            tcObject:
+//              if Prop.GetValue(TObject(Entity)).IsEmpty then
+//              begin
+//                TypProp := FindClassType(Prop.PropertyType.ToString);
+//                Meth := TypProp.GetMethod('Create');
+//                Prop.SetValue(TObject(Entity), Meth.Invoke(TypProp.AsInstance.MetaclassType, []));
+//
+//                TypProp := FindClassType(Prop.PropertyType.ToString);
+//                Meth := TypProp.GetMethod('Create');
+//                ObjEntity := Meth.Invoke(TypProp.AsInstance.MetaclassType, []).AsObject;
+//                ParseRecordDataSet(pSource, TJSOrmEntity(ObjEntity));
+//                Prop.SetValue(TObject(Entity), ObjEntity);
+//              end;
+//            tcObjectList:
+//              if Prop.GetValue(TObject(Entity)).IsEmpty then
+//              begin
+//                TypProp := FindClassType(Prop.PropertyType.ToString);
+//                Meth := TypProp.GetMethod('Create');
+//                Prop.SetValue(TObject(Entity), Meth.Invoke(TypProp.AsInstance.MetaclassType, [True]));
+//              end;
+//      end;
+//    end;
+//  finally
+//    Context.Free;
+//  end;
+//end;
 
 class function TJSOrmRtti.ParseRecordDataSet<T>(const pSource: TDataSet): T;
 var
@@ -380,16 +470,18 @@ begin
           tcObject:
             if Prop.GetValue(TObject(Result)).IsEmpty then
             begin
-              TypProp := FindClassType(Prop.PropertyType.ToString);
-              Meth := TypProp.GetMethod('Create');
-              Prop.SetValue(TObject(Result), Meth.Invoke(TypProp.AsInstance.MetaclassType, []));
+//              TypProp := FindClassType(Prop.PropertyType.ToString);
+//              Meth := TypProp.GetMethod('Create');
+//              Meth.Invoke(TypProp.AsInstance.MetaclassType, [])
+//              Prop.SetValue(TObject(Result), );
             end;
           tcObjectList:
             if Prop.GetValue(TObject(Result)).IsEmpty then
             begin
-              TypProp := FindClassType(Prop.PropertyType.ToString);
-              Meth := TypProp.GetMethod('Create');
-              Prop.SetValue(TObject(Result), Meth.Invoke(TypProp.AsInstance.MetaclassType, [True]));
+//              TypProp := FindClassType(Prop.PropertyType.ToString);
+//              Meth := TypProp.GetMethod('Create');
+//              Meth.Invoke(TypProp.AsInstance.MetaclassType, [True])
+//              Prop.SetValue(TObject(Result), );
             end;
         end;
       end;
@@ -433,6 +525,8 @@ begin
           Result.AddPair(Prop.Name, TJSONString.Create(DateTimeToISOTimeStamp(Prop.GetValue(pEntity).AsVariant)));
         tcDate:
           Result.AddPair(Prop.Name, TJSONString.Create(DateToISODate(Prop.GetValue(pEntity).AsVariant)));
+        tcArray:
+          Result.AddPair(Prop.Name, VariantArrayToJSONArray(Prop.GetValue(pEntity).AsVariant));
         tcObject:
           Result.AddPair(Prop.Name, TJSOrmEntity(Prop.GetValue(pEntity).AsObject).ToJsonObject);
         tcObjectList:

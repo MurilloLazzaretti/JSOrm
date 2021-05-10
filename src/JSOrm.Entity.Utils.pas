@@ -2,16 +2,33 @@ unit JSOrm.Entity.Utils;
 
 interface
 
+uses
+  JSON;
+
 function ISOTimeStampToDateTime(const dateTime: string): TDateTime;
 function ISODateToDate(const date: string): TDate;
 function DateTimeToISOTimeStamp(const dateTime: TDateTime): string;
 function DateToISODate(const date: TDateTime): string;
+function VariantArrayToJSONArray(const pVariantArray : Variant) : TJSONArray;
 
 implementation
 
 uses
   System.SysUtils,
-  System.DateUtils;
+  System.Variants,
+  System.DateUtils,
+  System.Rtti;
+
+function VariantArrayToJSONArray(const pVariantArray : Variant) : TJSONArray;
+var
+  Length : integer;
+  I: Integer;
+begin
+  Result := TJSONArray.Create;
+  Length := VarArrayHighBound(pVariantArray, 1);
+  for I := 0 to Length -1 do
+    Result.AddElement(TJSONString.Create(pVariantArray[i]));
+end;
 
 function ISOTimeStampToDateTime(const dateTime: string): TDateTime;
 begin
