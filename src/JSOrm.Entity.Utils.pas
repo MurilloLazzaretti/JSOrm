@@ -54,7 +54,10 @@ var
   fs: TFormatSettings;
 begin
   fs.TimeSeparator := ':';
-  Result := FormatDateTime('yyyy-mm-dd hh:nn:ss', dateTime, fs);
+  if dateTime > 0 then
+    Result := FormatDateTime('yyyy-mm-dd hh:nn:ss', dateTime, fs)
+  else
+    Result := '';
 end;
 
 function DateToISODate(const date: TDateTime): string;
