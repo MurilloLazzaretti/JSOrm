@@ -19,11 +19,8 @@ uses
   FireDAC.Phys.MSSQL,
   System.Generics.Collections;
 
-var
-  FConnList : TObjectList<TFDConnection>;
 
-function Connected : Integer;
-procedure Disconnected(Index : Integer);
+function Connected : TFDConnection;
 
 implementation
 
@@ -31,28 +28,20 @@ uses
   System.SysUtils,
   JSOrm.Params;
 
-function Connected : Integer;
+function Connected : TFDConnection;
 begin
   if not Assigned(JSOrm.Params.ConnectionParams) then
     raise Exception.Create('JSorm was not started.')
   else
   begin
-    FConnList.Add(TFDConnection.Create(nil));
-    Result := Pred(FConnList.Count);
-    FConnList.Items[Result].Params.Add('DriverID=' + JSOrm.Params.ConnectionParams.Driver);
-    FConnList.Items[Result].Params.Add('Server=' + JSOrm.Params.ConnectionParams.Server);
-    FConnList.Items[Result].Params.Add('Database=' + JSOrm.Params.ConnectionParams.DataBase);
-    FConnList.Items[Result].Params.Add('User_Name=' + JSOrm.Params.ConnectionParams.User);
-    FConnList.Items[Result].Params.Add('Password=' + JSOrm.Params.ConnectionParams.Password);
-    FConnList.Items[Result].Connected;
+    Result := TFDConnection.Create(nil);
+    Result.Params.Add('DriverID=' + JSOrm.Params.ConnectionParams.Driver);
+    Result.Params.Add('Server=' + JSOrm.Params.ConnectionParams.Server);
+    Result.Params.Add('Database=' + JSOrm.Params.ConnectionParams.DataBase);
+    Result.Params.Add('User_Name=' + JSOrm.Params.ConnectionParams.User);
+    Result.Params.Add('Password=' + JSOrm.Params.ConnectionParams.Password);
+    Result.Connected := True;
   end;
-end;
-
-procedure Disconnected(Index : Integer);
-begin
-  FConnList.Items[Index].Connected := False;
-  FConnList.Delete(Index);
-  FConnList.TrimExcess;
 end;
 
 end.

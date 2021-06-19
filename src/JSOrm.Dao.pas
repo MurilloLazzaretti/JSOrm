@@ -12,6 +12,7 @@ uses
 type
   TJSOrmDao<T : TJSOrmEntity> = class
   protected
+    FDbConn : TFDConnection;
     FIndexConn: integer;
     FQuery: TFDQuery;
   public
@@ -42,14 +43,15 @@ end;
 constructor TJSOrmDao<T>.Create;
 begin
   FQuery := TFDQuery.Create(nil);
-  FIndexConn := JSOrm.Connection.Connected;
-  FQuery.Connection := JSOrm.Connection.FConnList.Items[FIndexConn];
+  FDbConn := JSOrm.Connection.Connected;
+  FQuery.Connection := FDbConn;
 end;
 
 destructor TJSOrmDao<T>.Destroy;
 begin
   FQuery.Free;
-  JSOrm.Connection.Disconnected(FIndexConn);
+  FDbConn.Connected := False;
+  FDbConn.Free;
   inherited;
 end;
 

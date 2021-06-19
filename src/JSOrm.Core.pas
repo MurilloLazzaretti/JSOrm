@@ -29,8 +29,8 @@ class procedure TJSOrm.Start(const pIniFileName, pIniSection: string);
 begin
   if not FStarted then
   begin
-    if not Assigned(JSOrm.Connection.FConnList) then
-      JSOrm.Connection.FConnList := TObjectList<TFDConnection>.Create;
+//    if not Assigned(JSOrm.Connection.FConnList) then
+//      JSOrm.Connection.FConnList := TObjectList<TFDConnection>.Create;
     if not Assigned(JSOrm.Params.ConnectionParams) then
       JSOrm.Params.ConnectionParams := TJSOrmConnectionParams.Create(pIniFileName, pIniSection);
     FStarted := True;
@@ -46,8 +46,8 @@ class procedure TJSOrm.Stop;
 begin
   if Assigned(JSOrm.Params.ConnectionParams) then
     JSOrm.Params.ConnectionParams.Free;
-  if Assigned(JSOrm.Connection.FConnList) then
-    JSOrm.Connection.FConnList.Free;
+//  if Assigned(JSOrm.Connection.FConnList) then
+//    JSOrm.Connection.FConnList.Free;
   FStarted := False;
 end;
 
