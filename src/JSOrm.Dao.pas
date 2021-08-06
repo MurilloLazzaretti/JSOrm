@@ -17,7 +17,7 @@ type
     FQuery: TFDQuery;
   public
     function AsObject : T;
-    function AsObjectList : TJSOrmEntityList<T>;
+    function AsObjectList(const pOwnsObjects: boolean = true) : TJSOrmEntityList<T>;
     constructor Create;
     destructor Destroy; override;
   end;
@@ -35,9 +35,9 @@ begin
   Result := TJSOrmRtti.ParseRecordDataSet<T>(FQuery);
 end;
 
-function TJSOrmDao<T>.AsObjectList: TJSOrmEntityList<T>;
+function TJSOrmDao<T>.AsObjectList(const pOwnsObjects: boolean = true): TJSOrmEntityList<T>;
 begin
-  Result := TJSOrmRtti.ParseDataSet<T>(FQuery);
+  Result := TJSOrmRtti.ParseDataSet<T>(FQuery, pOwnsObjects);
 end;
 
 constructor TJSOrmDao<T>.Create;

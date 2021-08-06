@@ -22,7 +22,7 @@ type
     class procedure CreateFieldsObject(const pEntity : TJSOrmEntity);
     class procedure DestroyFieldsObject(const pEntity : TJSOrmEntity);
     class function ParseJsonObject<T : class>(const pSource : TJSONObject) : T; overload;
-    class function ParseDataSet<T : TJSOrmEntity>(const pSource : TDataSet) : TJSOrmEntityList<T>;
+    class function ParseDataSet<T : TJSOrmEntity>(const pSource : TDataSet; const pOwnsObjects : boolean) : TJSOrmEntityList<T>;
     class function ParseRecordDataSet<T : class>(const pSource : TDataSet) : T; overload;
     class function ToJsonObject(const pEntity : TJSOrmEntity): TJSONObject;
     class function ToJsonArray(const pEntity : TJSOrmEntityList<TJSOrmEntity>) : TJSONArray;
@@ -152,7 +152,7 @@ begin
   Result := T(GetTypeData(PTypeInfo(TypeInfo(T)))^.ClassType.Create);
 end;
 
-class function TJSOrmRtti.ParseDataSet<T>(const pSource: TDataSet): TJSOrmEntityList<T>;
+class function TJSOrmRtti.ParseDataSet<T>(const pSource: TDataSet; const pOwnsObjects : boolean): TJSOrmEntityList<T>;
 var
   Context : TRttiContext;
   TypObj, TypProp: TRttiType;
@@ -164,7 +164,7 @@ begin
   Context := TRttiContext.Create;
   try
     TypObj := Context.GetType(T.ClassInfo);
-    Result := TJSOrmEntityList<T>.Create;
+    Result := TJSOrmEntityList<T>.Create(pOwnsObjects);
     while not pSource.Eof do
     begin
       Entity := T(GetTypeData(PTypeInfo(TypeInfo(T)))^.ClassType.Create);
@@ -447,25 +447,28 @@ begin
     TypObj := Context.GetType(pEntity.ClassInfo);
     for Prop in TypObj.GetProperties do
     begin
-      case TEntityFieldAttributes(Prop.GetAttributes[0])._Type of
-        tcString:
-          Result.AddPair(Prop.Name, TJSONString.Create(Prop.GetValue(pEntity).AsString));
-        tcInteger:
-          Result.AddPair(Prop.Name, TJSONNumber.Create(Prop.GetValue(pEntity).AsInteger));
-        tcFloat:
-          Result.AddPair(Prop.Name, TJSONNumber.Create(Prop.GetValue(pEntity).AsVariant));
-        tcDateTime:
-          Result.AddPair(Prop.Name, TJSONString.Create(DateTimeToISOTimeStamp(Prop.GetValue(pEntity).AsVariant)));
-        tcDate:
-          Result.AddPair(Prop.Name, TJSONString.Create(DateToISODate(Prop.GetValue(pEntity).AsVariant)));
-        tcArrayString:
-          Result.AddPair(Prop.Name, ArrayToJSONArray(Prop.GetValue(pEntity).AsType<TArray<string>>));
-        tcArrayInteger:
-          Result.AddPair(Prop.Name, ArrayToJSONArray(Prop.GetValue(pEntity).AsType<TArray<integer>>));
-        tcObject:
-          Result.AddPair(Prop.Name, TJSOrmEntity(Prop.GetValue(pEntity).AsObject).ToJsonObject);
-        tcObjectList:
-          Result.AddPair(Prop.Name, TJSOrmEntityList<TJSOrmEntity>(Prop.GetValue(pEntity).AsObject).ToJsonArray);
+      if TEntityFieldAttributes(Prop.GetAttributes[0])._ExportToJson then
+      begin
+        case TEntityFieldAttributes(Prop.GetAttributes[0])._Type of
+          tcString:
+            Result.AddPair(Prop.Name, TJSONString.Create(Prop.GetValue(pEntity).AsString));
+          tcInteger:
+            Result.AddPair(Prop.Name, TJSONNumber.Create(Prop.GetValue(pEntity).AsInteger));
+          tcFloat:
+            Result.AddPair(Prop.Name, TJSONNumber.Create(Prop.GetValue(pEntity).AsVariant));
+          tcDateTime:
+            Result.AddPair(Prop.Name, TJSONString.Create(DateTimeToISOTimeStamp(Prop.GetValue(pEntity).AsVariant)));
+          tcDate:
+            Result.AddPair(Prop.Name, TJSONString.Create(DateToISODate(Prop.GetValue(pEntity).AsVariant)));
+          tcArrayString:
+            Result.AddPair(Prop.Name, ArrayToJSONArray(Prop.GetValue(pEntity).AsType<TArray<string>>));
+          tcArrayInteger:
+            Result.AddPair(Prop.Name, ArrayToJSONArray(Prop.GetValue(pEntity).AsType<TArray<integer>>));
+          tcObject:
+            Result.AddPair(Prop.Name, TJSOrmEntity(Prop.GetValue(pEntity).AsObject).ToJsonObject);
+          tcObjectList:
+            Result.AddPair(Prop.Name, TJSOrmEntityList<TJSOrmEntity>(Prop.GetValue(pEntity).AsObject).ToJsonArray);
+        end;
       end;
     end;
   finally
