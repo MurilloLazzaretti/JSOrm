@@ -21,6 +21,7 @@ type
 
   TJSOrmEntityList<T : TJSOrmEntity> = class(TObjectList<T>)
   public
+    class function New(const pJsonObject : TJSONArray) : TJSOrmEntityList<T>;
     function ToJsonArray : TJSONArray;
   end;
 
@@ -68,6 +69,12 @@ begin
 end;
 
 { TJSOrmEntityList<T> }
+
+class function TJSOrmEntityList<T>.New(
+  const pJsonObject: TJSONArray): TJSOrmEntityList<T>;
+begin
+  Result := TJSOrmRtti.ParseJsonArray<T>(pJsonObject);
+end;
 
 function TJSOrmEntityList<T>.ToJsonArray: TJSONArray;
 begin

@@ -22,6 +22,7 @@ type
     class procedure CreateFieldsObject(const pEntity : TJSOrmEntity);
     class procedure DestroyFieldsObject(const pEntity : TJSOrmEntity);
     class function ParseJsonObject<T : class>(const pSource : TJSONObject) : T; overload;
+    class function ParseJsonArray<T : TJSOrmEntity>(const pSource : TJSONArray) : TJSOrmEntityList<T>; overload;
     class function ParseDataSet<T : TJSOrmEntity>(const pSource : TDataSet; const pOwnsObjects : boolean) : TJSOrmEntityList<T>;
     class function ParseRecordDataSet<T : class>(const pSource : TDataSet) : T; overload;
     class function ToJsonObject(const pEntity : TJSOrmEntity): TJSONObject;
@@ -277,6 +278,67 @@ begin
   for I := 0 to Pred(pSource.Count) do
   begin
     Result[i] := TValue.FromVariant(pSource.Items[i].Value);
+  end;
+end;
+
+class function TJSOrmRtti.ParseJsonArray<T>(
+  const pSource: TJSONArray): TJSOrmEntityList<T>;
+var
+  Context : TRttiContext;
+  TypObj : TRttiType;
+  Meth : TRttiMethod;
+  Prop: TRttiProperty;
+  I : integer;
+  Entity : TObject;
+begin
+  if not Assigned(pSource) then
+    Exit;
+  Context := TRttiContext.Create;
+  try
+    TypObj := Context.GetType(T.ClassInfo);
+    Result := TJSOrmEntityList<T>.Create;
+    if pSource.Count > 0 then
+    begin
+      for I := 0 to Pred(pSource.Count) do
+      begin
+        Meth := TypObj.GetMethod('Create');
+        Entity := Meth.Invoke(TypObj.AsInstance.MetaclassType, []).AsObject;
+        Result.Add(TJSOrmEntity(Entity));
+        for Prop in TypObj.GetProperties do
+        begin
+          if Assigned(TJSONObject(pSource.Items[i]).GetValue(Prop.Name)) then
+          begin
+            try
+              case TEntityFieldAttributes(Prop.GetAttributes[0])._Type of
+                tcString:
+                  Prop.SetValue(Entity, TValue.FromVariant(TJSONObject(pSource.Items[i]).GetValue(Prop.Name).Value));
+                tcInteger:
+                  Prop.SetValue(Entity, TValue.FromVariant(StrToInt(TJSONObject(pSource.Items[i]).GetValue(Prop.Name).Value)));
+                tcFloat:
+                  Prop.SetValue(Entity, TValue.FromVariant((TJSONObject(pSource.Items[i]).GetValue(Prop.Name) as TJSONNumber).AsDouble));
+                tcDateTime:
+                  Prop.SetValue(Entity, TValue.FromVariant(ISOTimeStampToDateTime(TJSONObject(pSource.Items[i]).GetValue(Prop.Name).Value)));
+                tcDate:
+                  Prop.SetValue(Entity, TValue.FromVariant(ISODateToDate(TJSONObject(pSource.Items[i]).GetValue(Prop.Name).Value)));
+                tcArrayString:
+                  Prop.SetValue(Entity, TValue.FromArray(Prop.PropertyType.Handle, ParseJsonArray(TJSONObject(pSource.Items[i]).GetValue(Prop.Name) as TJSONArray)));
+                tcArrayInteger:
+                  Prop.SetValue(Entity, TValue.FromArray(Prop.PropertyType.Handle, ParseJsonArray(TJSONObject(pSource.Items[i]).GetValue(Prop.Name) as TJSONArray)));
+                tcObject:
+                  Prop.SetValue(Entity, ParseJsonObject(TJSONObject(pSource.Items[i]).GetValue(Prop.Name) as TJSONObject, Prop.PropertyType.ToString));
+                tcObjectList:
+                  Prop.SetValue(Entity, ParseJsonArray(TJSONObject(pSource.Items[i]).GetValue(Prop.Name) as TJSONArray, Prop.PropertyType.ToString));
+              end;
+            except
+              FreeAndNil(Result);
+              exit;
+            end;
+          end;
+        end;
+      end;
+    end;
+  finally
+    Context.Free;
   end;
 end;
 
