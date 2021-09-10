@@ -15,6 +15,7 @@ type
     procedure SetPassword(const Value: string);
     procedure SetServer(const Value: string);
     procedure SetUser(const Value: string);
+    function GetDllDirectory: string;
   public
     property Driver : string read FDriver write SetDriver;
     property Server : string read FServer write SetServer;
@@ -42,13 +43,11 @@ var
   DirWin : PChar;
   FileName : string;
 begin
-  FileName := ExtractFilePath(Application.ExeName) + pIniFileName;
-  if not FileExists(FileName) then
-  begin
-    DirWin := PChar(StringofChar(' ', 255));
-    GetWindowsDirectory(dirwin, 255);
-    FileName := DirWin + pIniFileName + '\';
-  end;
+  {$IFDEF HORSE_ISAPI}
+    FileName := ExtractFilePath(GetDllDirectory) + pIniFileName;
+  {$ELSE}
+    FileName := ExtractFilePath(Application.ExeName) + pIniFileName;
+  {$ENDIF}
   if FileExists(FileName) then
   begin
     IniFile := TIniFile.Create(FileName);
@@ -62,8 +61,17 @@ begin
       IniFile.Free;
     end;
   end
-  else
-    raise Exception.Create('Inifile not found');
+end;
+
+function TJSOrmConnectionParams.GetDllDirectory: string;
+var
+  pName: PChar;
+begin
+  GetMem(pName, 200);
+  windows.GetModuleFileName(HInstance, pName, 200);
+  Result := string(pName);
+  Result := Copy(Result , Pos(':', Result) - 1, Length(Result));
+  FreeMem(pName);
 end;
 
 procedure TJSOrmConnectionParams.SetDataBase(const Value: string);
