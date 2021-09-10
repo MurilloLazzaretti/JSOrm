@@ -40,7 +40,6 @@ uses
 constructor TJSOrmConnectionParams.Create(const pIniFileName : string; const pIniSection : string);
 var
   IniFile : TIniFile;
-  DirWin : PChar;
   FileName : string;
 begin
   {$IFDEF HORSE_ISAPI}
