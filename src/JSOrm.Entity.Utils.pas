@@ -56,7 +56,7 @@ begin
   fs.TimeSeparator := ':';
   if dateTime > 0 then
   begin
-    Result := FormatDateTime('yyyy-mm-dd hh:nn:ss', dateTime, fs);
+    Result := FormatDateTime('yyyy-mm-dd hh:nn:ss.zzz', dateTime, fs);
     Result := Result.Replace(' ', 'T', [rfReplaceAll]);
   end
   else

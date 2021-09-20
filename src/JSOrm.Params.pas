@@ -15,7 +15,9 @@ type
     procedure SetPassword(const Value: string);
     procedure SetServer(const Value: string);
     procedure SetUser(const Value: string);
+    {$IFDEF HORSE_ISAPI}
     function GetDllDirectory: string;
+    {$ENDIF}
   public
     property Driver : string read FDriver write SetDriver;
     property Server : string read FServer write SetServer;
@@ -62,6 +64,7 @@ begin
   end
 end;
 
+{$IFDEF HORSE_ISAPI}
 function TJSOrmConnectionParams.GetDllDirectory: string;
 var
   pName: PChar;
@@ -72,6 +75,7 @@ begin
   Result := Copy(Result , Pos(':', Result) - 1, Length(Result));
   FreeMem(pName);
 end;
+{$ENDIF}
 
 procedure TJSOrmConnectionParams.SetDataBase(const Value: string);
 begin
