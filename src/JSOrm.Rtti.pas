@@ -6,6 +6,7 @@ uses
   Rtti,
   Data.DB,
   Generics.Collections,
+  JSOrm.Entity.Attributes,
   JSOrm.Entity,
   System.JSON;
 
@@ -16,7 +17,7 @@ type
     class function FindClassTypeList(const ClassName : string) : TRttiType;
     class function ParseJsonObject(const pSource : TJSONObject; const pEntityClassName : string) : TJSOrmEntity; overload;
     class function ParseJsonArray(const pSource : TJSONArray; const pEntityClassName : string) : TJSOrmEntityList<TJSOrmEntity>; overload;
-    class function ParseJsonArray(const pSource : TJSONArray) : TArray<TValue>; overload;
+    class function ParseJsonArray(const pSource : TJSONArray; const pTypeArray : TEntityFieldType) : TArray<TValue>; overload;
   public
     class function New<T : TJSOrmEntity> : T; overload;
     class procedure CreateFieldsObject(const pEntity : TJSOrmEntity);
@@ -35,8 +36,7 @@ uses
   System.SysUtils,
   System.StrUtils,
   System.TypInfo,
-  JSOrm.Entity.Utils,
-  JSOrm.Entity.Attributes;
+  JSOrm.Entity.Utils;
 
 { TEntityRtti }
 
@@ -251,9 +251,9 @@ begin
               tcDate:
                 Prop.SetValue(Entity, TValue.FromVariant(ISODateToDate(TJSONObject(pSource.Items[i]).GetValue(Prop.Name).Value)));
               tcArrayString:
-                Prop.SetValue(Entity, TValue.FromArray(Prop.PropertyType.Handle, ParseJsonArray(TJSONObject(pSource.Items[i]).GetValue(Prop.Name) as TJSONArray)));
+                Prop.SetValue(Entity, TValue.FromArray(Prop.PropertyType.Handle, ParseJsonArray(TJSONObject(pSource.Items[i]).GetValue(Prop.Name) as TJSONArray, tcArrayString)));
               tcArrayInteger:
-                Prop.SetValue(Entity, TValue.FromArray(Prop.PropertyType.Handle, ParseJsonArray(TJSONObject(pSource.Items[i]).GetValue(Prop.Name) as TJSONArray)));
+                Prop.SetValue(Entity, TValue.FromArray(Prop.PropertyType.Handle, ParseJsonArray(TJSONObject(pSource.Items[i]).GetValue(Prop.Name) as TJSONArray, tcArrayInteger)));
               tcObject:
                 Prop.SetValue(Entity, ParseJsonObject(TJSONObject(pSource.Items[i]).GetValue(Prop.Name) as TJSONObject, Prop.PropertyType.ToString));
               tcObjectList:
@@ -270,14 +270,28 @@ begin
 end;
 
 class function TJSOrmRtti.ParseJsonArray(
-  const pSource: TJSONArray): TArray<TValue>;
+  const pSource: TJSONArray; const pTypeArray : TEntityFieldType): TArray<TValue>;
 var
   I: Integer;
 begin
   SetLength(Result, pSource.Count);
-  for I := 0 to Pred(pSource.Count) do
+  if pTypeArray = tcArrayString then
   begin
-    Result[i] := TValue.FromVariant(pSource.Items[i].Value);
+    for I := 0 to Pred(pSource.Count) do
+    begin
+      Result[i] := TValue.FromVariant(pSource.Items[i].Value);
+    end;
+  end
+  else if pTypeArray = tcArrayInteger then
+  begin
+    for I := 0 to Pred(pSource.Count) do
+    begin
+      Result[i] := TValue.FromVariant(StrToInt(pSource.Items[i].Value));
+    end;
+  end
+  else
+  begin
+    raise Exception.Create('pTypeArray invalid');
   end;
 end;
 
@@ -321,9 +335,9 @@ begin
                 tcDate:
                   Prop.SetValue(Entity, TValue.FromVariant(ISODateToDate(TJSONObject(pSource.Items[i]).GetValue(Prop.Name).Value)));
                 tcArrayString:
-                  Prop.SetValue(Entity, TValue.FromArray(Prop.PropertyType.Handle, ParseJsonArray(TJSONObject(pSource.Items[i]).GetValue(Prop.Name) as TJSONArray)));
+                  Prop.SetValue(Entity, TValue.FromArray(Prop.PropertyType.Handle, ParseJsonArray(TJSONObject(pSource.Items[i]).GetValue(Prop.Name) as TJSONArray, tcArrayString)));
                 tcArrayInteger:
-                  Prop.SetValue(Entity, TValue.FromArray(Prop.PropertyType.Handle, ParseJsonArray(TJSONObject(pSource.Items[i]).GetValue(Prop.Name) as TJSONArray)));
+                  Prop.SetValue(Entity, TValue.FromArray(Prop.PropertyType.Handle, ParseJsonArray(TJSONObject(pSource.Items[i]).GetValue(Prop.Name) as TJSONArray, tcArrayInteger)));
                 tcObject:
                   Prop.SetValue(Entity, ParseJsonObject(TJSONObject(pSource.Items[i]).GetValue(Prop.Name) as TJSONObject, Prop.PropertyType.ToString));
                 tcObjectList:
@@ -369,9 +383,9 @@ begin
           tcDate:
             Prop.SetValue(TObject(Result), TValue.FromVariant(ISODateToDate(pSource.GetValue(Prop.Name).Value)));
           tcArrayString:
-            Prop.SetValue(TObject(Result), TValue.FromArray(Prop.PropertyType.Handle, ParseJsonArray(pSource.GetValue(Prop.Name) as TJSONArray)));
+            Prop.SetValue(TObject(Result), TValue.FromArray(Prop.PropertyType.Handle, ParseJsonArray(pSource.GetValue(Prop.Name) as TJSONArray, tcArrayString)));
           tcArrayInteger:
-            Prop.SetValue(TObject(Result), TValue.FromArray(Prop.PropertyType.Handle, ParseJsonArray(pSource.GetValue(Prop.Name) as TJSONArray)));
+            Prop.SetValue(TObject(Result), TValue.FromArray(Prop.PropertyType.Handle, ParseJsonArray(pSource.GetValue(Prop.Name) as TJSONArray, tcArrayInteger)));
           tcObject:
             Prop.SetValue(TObject(Result), ParseJsonObject(pSource.GetValue(Prop.Name) as TJSONObject, Prop.PropertyType.ToString));
           tcObjectList:
@@ -414,9 +428,9 @@ begin
             tcDate:
               Prop.SetValue(TObject(Result), TValue.FromVariant(ISODateToDate(pSource.GetValue(Prop.Name).Value)));
             tcArrayString:
-              Prop.SetValue(TObject(Result), TValue.FromArray(Prop.PropertyType.Handle, ParseJsonArray(pSource.GetValue(Prop.Name) as TJSONArray)));
+              Prop.SetValue(TObject(Result), TValue.FromArray(Prop.PropertyType.Handle, ParseJsonArray(pSource.GetValue(Prop.Name) as TJSONArray, tcArrayString)));
             tcArrayInteger:
-              Prop.SetValue(TObject(Result), TValue.FromArray(Prop.PropertyType.Handle, ParseJsonArray(pSource.GetValue(Prop.Name) as TJSONArray)));
+              Prop.SetValue(TObject(Result), TValue.FromArray(Prop.PropertyType.Handle, ParseJsonArray(pSource.GetValue(Prop.Name) as TJSONArray, tcArrayInteger)));
             tcObject:
               Prop.SetValue(TObject(Result), ParseJsonObject(pSource.GetValue(Prop.Name) as TJSONObject, Prop.PropertyType.ToString));
             tcObjectList:
