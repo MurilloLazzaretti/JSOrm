@@ -39,13 +39,20 @@ begin
     raise Exception.Create('JSorm was not started.')
   else
   begin
-    Result := TFDConnection.Create(nil);
-    Result.Params.Add('DriverID=' + JSOrm.Params.ConnectionParams.Driver);
-    Result.Params.Add('Server=' + JSOrm.Params.ConnectionParams.Server);
-    Result.Params.Add('Database=' + JSOrm.Params.ConnectionParams.DataBase);
-    Result.Params.Add('User_Name=' + JSOrm.Params.ConnectionParams.User);
-    Result.Params.Add('Password=' + JSOrm.Params.ConnectionParams.Password);
-    Result.Connected := True;
+    try
+      Result := TFDConnection.Create(nil);
+      Result.Params.Add('DriverID=' + JSOrm.Params.ConnectionParams.Driver);
+      Result.Params.Add('Server=' + JSOrm.Params.ConnectionParams.Server);
+      Result.Params.Add('Database=' + JSOrm.Params.ConnectionParams.DataBase);
+      Result.Params.Add('User_Name=' + JSOrm.Params.ConnectionParams.User);
+      Result.Params.Add('Password=' + JSOrm.Params.ConnectionParams.Password);
+      Result.Connected := True;
+    except
+      on E : Exception do
+      begin
+        raise Exception.Create('Falha ao conectar no banco de dados:' + e.Message);
+      end;
+    end;
   end;
 end;
 
