@@ -43,15 +43,22 @@ end;
 constructor TJSOrmDao<T>.Create;
 begin
   FQuery := TFDQuery.Create(nil);
-  FDbConn := JSOrm.Connection.Connected;
-  FQuery.Connection := FDbConn;
+  try
+    FDbConn := JSOrm.Connection.Connected;
+    FQuery.Connection := FDbConn;
+  except
+    raise;
+  end;
 end;
 
 destructor TJSOrmDao<T>.Destroy;
 begin
   FQuery.Free;
-  FDbConn.Connected := False;
-  FDbConn.Free;
+  if FDbConn <> nil then
+  begin
+    FDbConn.Connected := False;
+    FDbConn.Free;
+  end;
   inherited;
 end;
 
