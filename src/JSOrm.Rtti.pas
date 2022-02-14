@@ -16,7 +16,7 @@ type
     class function FindClassType(const ClassName : string) : TRttiType;
     class function FindClassTypeList(const ClassName : string) : TRttiType;
     class function ParseJsonObject(const pSource : TJSONObject; const pEntityClassName : string) : TJSOrmEntity; overload;
-    class function ParseJsonArray(const pSource : TJSONArray; const pEntityClassName : string) : TJSOrmEntityList<TJSOrmEntity>; overload;
+    class function ParseJsonArray(const pSource : TJSONArray; const pEntityClassName : string; const pOwnsObjects: boolean) : TJSOrmEntityList<TJSOrmEntity>; overload;
     class function ParseJsonArray(const pSource : TJSONArray; const pTypeArray : TEntityFieldType) : TArray<TValue>; overload;
   public
     class function New<T : TJSOrmEntity> : T; overload;
@@ -215,7 +215,7 @@ begin
 end;
 
 class function TJSOrmRtti.ParseJsonArray(const pSource: TJSONArray;
-  const pEntityClassName: string): TJSOrmEntityList<TJSOrmEntity>;
+  const pEntityClassName: string; const pOwnsObjects: boolean): TJSOrmEntityList<TJSOrmEntity>;
 var
   TypResult, TypObj: TRttiType;
   Meth : TRttiMethod;
@@ -225,14 +225,14 @@ var
 begin
   TypResult := FindClassType(pEntityClassName);
   Meth := TypResult.GetMethod('Create');
-  Result := TJSOrmEntityList<TJSOrmEntity>(Meth.Invoke(TypResult.AsInstance.MetaclassType, [True]).AsObject);
+  Result := TJSOrmEntityList<TJSOrmEntity>(Meth.Invoke(TypResult.AsInstance.MetaclassType, [pOwnsObjects]).AsObject);
   TypObj := FindClassTypeList(pEntityClassName);
   if pSource.Count > 0 then
   begin
     for I := 0 to Pred(pSource.Count) do
     begin
       Meth := TypObj.GetMethod('Create');
-      Entity := Meth.Invoke(TypObj.AsInstance.MetaclassType, []).AsObject;
+      Entity := Meth.Invoke(TypObj.AsInstance.MetaclassType, [False]).AsObject;
       Result.Add(TJSOrmEntity(Entity));
       for Prop in TypObj.GetProperties do
       begin
@@ -257,7 +257,7 @@ begin
               tcObject:
                 Prop.SetValue(Entity, ParseJsonObject(TJSONObject(pSource.Items[i]).GetValue(Prop.Name) as TJSONObject, Prop.PropertyType.ToString));
               tcObjectList:
-                Prop.SetValue(Entity, ParseJsonArray(TJSONObject(pSource.Items[i]).GetValue(Prop.Name) as TJSONArray, Prop.PropertyType.ToString));
+                Prop.SetValue(Entity, ParseJsonArray(TJSONObject(pSource.Items[i]).GetValue(Prop.Name) as TJSONArray, Prop.PropertyType.ToString, True));
             end;
           except
             FreeAndNil(Result);
@@ -316,7 +316,7 @@ begin
       for I := 0 to Pred(pSource.Count) do
       begin
         Meth := TypObj.GetMethod('Create');
-        Entity := Meth.Invoke(TypObj.AsInstance.MetaclassType, []).AsObject;
+        Entity := Meth.Invoke(TypObj.AsInstance.MetaclassType, [False]).AsObject;
         Result.Add(TJSOrmEntity(Entity));
         for Prop in TypObj.GetProperties do
         begin
@@ -341,7 +341,7 @@ begin
                 tcObject:
                   Prop.SetValue(Entity, ParseJsonObject(TJSONObject(pSource.Items[i]).GetValue(Prop.Name) as TJSONObject, Prop.PropertyType.ToString));
                 tcObjectList:
-                  Prop.SetValue(Entity, ParseJsonArray(TJSONObject(pSource.Items[i]).GetValue(Prop.Name) as TJSONArray, Prop.PropertyType.ToString));
+                  Prop.SetValue(Entity, ParseJsonArray(TJSONObject(pSource.Items[i]).GetValue(Prop.Name) as TJSONArray, Prop.PropertyType.ToString, True));
               end;
             except
               FreeAndNil(Result);
@@ -389,7 +389,7 @@ begin
           tcObject:
             Prop.SetValue(TObject(Result), ParseJsonObject(pSource.GetValue(Prop.Name) as TJSONObject, Prop.PropertyType.ToString));
           tcObjectList:
-            Prop.SetValue(TObject(Result), ParseJsonArray(pSource.GetValue(Prop.Name) as TJSONArray, Prop.PropertyType.ToString));
+            Prop.SetValue(TObject(Result), ParseJsonArray(pSource.GetValue(Prop.Name) as TJSONArray, Prop.PropertyType.ToString, True));
         end;
       except
         FreeAndNil(Result);
@@ -434,7 +434,7 @@ begin
             tcObject:
               Prop.SetValue(TObject(Result), ParseJsonObject(pSource.GetValue(Prop.Name) as TJSONObject, Prop.PropertyType.ToString));
             tcObjectList:
-              Prop.SetValue(TObject(Result), ParseJsonArray(pSource.GetValue(Prop.Name) as TJSONArray, Prop.PropertyType.ToString));
+              Prop.SetValue(TObject(Result), ParseJsonArray(pSource.GetValue(Prop.Name) as TJSONArray, Prop.PropertyType.ToString, True));
           end;
         except
           FreeAndNil(Result);

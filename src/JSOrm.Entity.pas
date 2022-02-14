@@ -15,13 +15,13 @@ type
     function ToJsonObject : TJSONObject;
     class function New<T : TJSOrmEntity>(const pJsonObject : TJSONObject) : T; overload;
     class function New<T : TJSOrmEntity> : T; overload;
-    constructor Create; overload;
+    constructor Create(const pCreateFieldsObject : boolean = True); overload;
     destructor Destroy; override;
   end;
 
   TJSOrmEntityList<T : TJSOrmEntity> = class(TObjectList<T>)
   public
-    class function New(const pJsonObject : TJSONArray) : TJSOrmEntityList<T>;
+    class function New(const pJsonObject : TJSONArray) : TJSOrmEntityList<T>; overload;
     function ToJsonArray : TJSONArray;
   end;
 
@@ -32,9 +32,10 @@ uses
 
 { TJSOrmEntityBase }
 
-constructor TJSOrmEntity.Create;
+constructor TJSOrmEntity.Create(const pCreateFieldsObject : boolean);
 begin
-  CreateFieldsObject;
+  if pCreateFieldsObject then
+    CreateFieldsObject;
 end;
 
 procedure TJSOrmEntity.CreateFieldsObject;
