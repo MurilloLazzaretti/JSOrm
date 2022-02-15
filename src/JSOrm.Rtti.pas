@@ -59,7 +59,7 @@ begin
         begin
           TypProp := FindClassType(Prop.PropertyType.ToString);
           Meth := TypProp.GetMethod('Create');
-          Prop.SetValue(pEntity, Meth.Invoke(TypProp.AsInstance.MetaclassType, []));
+          Prop.SetValue(pEntity, Meth.Invoke(TypProp.AsInstance.MetaclassType, [True]));
         end
         else if TEntityFieldAttributes(Attribute)._Type = tcObjectList then
         begin
