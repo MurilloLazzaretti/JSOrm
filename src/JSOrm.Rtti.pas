@@ -194,7 +194,7 @@ begin
               begin
                 TypProp := FindClassType(Prop.PropertyType.ToString);
                 Meth := TypProp.GetMethod('Create');
-                Prop.SetValue(TObject(Entity), Meth.Invoke(TypProp.AsInstance.MetaclassType, []));
+                Prop.SetValue(TObject(Entity), Meth.Invoke(TypProp.AsInstance.MetaclassType, [True]));
               end;
             tcObjectList:
               if Prop.GetValue(TObject(Entity)).IsEmpty then
