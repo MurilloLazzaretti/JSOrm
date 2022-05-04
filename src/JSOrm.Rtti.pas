@@ -254,6 +254,8 @@ begin
                 Prop.SetValue(Entity, TValue.FromArray(Prop.PropertyType.Handle, ParseJsonArray(TJSONObject(pSource.Items[i]).GetValue(Prop.Name) as TJSONArray, tcArrayString)));
               tcArrayInteger:
                 Prop.SetValue(Entity, TValue.FromArray(Prop.PropertyType.Handle, ParseJsonArray(TJSONObject(pSource.Items[i]).GetValue(Prop.Name) as TJSONArray, tcArrayInteger)));
+              tcArrayDouble:
+                Prop.SetValue(Entity, TValue.FromArray(Prop.PropertyType.Handle, ParseJsonArray(TJSONObject(pSource.Items[i]).GetValue(Prop.Name) as TJSONArray, tcArrayDouble)));
               tcObject:
                 Prop.SetValue(Entity, ParseJsonObject(TJSONObject(pSource.Items[i]).GetValue(Prop.Name) as TJSONObject, Prop.PropertyType.ToString));
               tcObjectList:
@@ -287,6 +289,13 @@ begin
     for I := 0 to Pred(pSource.Count) do
     begin
       Result[i] := TValue.FromVariant(StrToInt(pSource.Items[i].Value));
+    end;
+  end
+  else if pTypeArray = tcArrayDouble then
+  begin
+    for I := 0 to Pred(pSource.Count) do
+    begin
+      Result[i] := TValue.FromVariant(StrToFloat(pSource.Items[i].Value));
     end;
   end
   else
@@ -338,6 +347,8 @@ begin
                   Prop.SetValue(Entity, TValue.FromArray(Prop.PropertyType.Handle, ParseJsonArray(TJSONObject(pSource.Items[i]).GetValue(Prop.Name) as TJSONArray, tcArrayString)));
                 tcArrayInteger:
                   Prop.SetValue(Entity, TValue.FromArray(Prop.PropertyType.Handle, ParseJsonArray(TJSONObject(pSource.Items[i]).GetValue(Prop.Name) as TJSONArray, tcArrayInteger)));
+                tcArrayDouble:
+                  Prop.SetValue(Entity, TValue.FromArray(Prop.PropertyType.Handle, ParseJsonArray(TJSONObject(pSource.Items[i]).GetValue(Prop.Name) as TJSONArray, tcArrayDouble)));
                 tcObject:
                   Prop.SetValue(Entity, ParseJsonObject(TJSONObject(pSource.Items[i]).GetValue(Prop.Name) as TJSONObject, Prop.PropertyType.ToString));
                 tcObjectList:
@@ -386,6 +397,8 @@ begin
             Prop.SetValue(TObject(Result), TValue.FromArray(Prop.PropertyType.Handle, ParseJsonArray(pSource.GetValue(Prop.Name) as TJSONArray, tcArrayString)));
           tcArrayInteger:
             Prop.SetValue(TObject(Result), TValue.FromArray(Prop.PropertyType.Handle, ParseJsonArray(pSource.GetValue(Prop.Name) as TJSONArray, tcArrayInteger)));
+          tcArrayDouble:
+            Prop.SetValue(TObject(Result), TValue.FromArray(Prop.PropertyType.Handle, ParseJsonArray(pSource.GetValue(Prop.Name) as TJSONArray, tcArrayDouble)));
           tcObject:
             Prop.SetValue(TObject(Result), ParseJsonObject(pSource.GetValue(Prop.Name) as TJSONObject, Prop.PropertyType.ToString));
           tcObjectList:
@@ -431,6 +444,8 @@ begin
               Prop.SetValue(TObject(Result), TValue.FromArray(Prop.PropertyType.Handle, ParseJsonArray(pSource.GetValue(Prop.Name) as TJSONArray, tcArrayString)));
             tcArrayInteger:
               Prop.SetValue(TObject(Result), TValue.FromArray(Prop.PropertyType.Handle, ParseJsonArray(pSource.GetValue(Prop.Name) as TJSONArray, tcArrayInteger)));
+            tcArrayDouble:
+              Prop.SetValue(TObject(Result), TValue.FromArray(Prop.PropertyType.Handle, ParseJsonArray(pSource.GetValue(Prop.Name) as TJSONArray, tcArrayDouble)));
             tcObject:
               Prop.SetValue(TObject(Result), ParseJsonObject(pSource.GetValue(Prop.Name) as TJSONObject, Prop.PropertyType.ToString));
             tcObjectList:
@@ -540,6 +555,8 @@ begin
             Result.AddPair(Prop.Name, ArrayToJSONArray(Prop.GetValue(pEntity).AsType<TArray<string>>));
           tcArrayInteger:
             Result.AddPair(Prop.Name, ArrayToJSONArray(Prop.GetValue(pEntity).AsType<TArray<integer>>));
+          tcArrayDouble:
+            Result.AddPair(Prop.Name, ArrayToJSONArray(Prop.GetValue(pEntity).AsType<TArray<double>>));
           tcObject:
             Result.AddPair(Prop.Name, TJSOrmEntity(Prop.GetValue(pEntity).AsObject).ToJsonObject);
           tcObjectList:
