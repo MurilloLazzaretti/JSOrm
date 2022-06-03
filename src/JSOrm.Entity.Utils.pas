@@ -50,7 +50,7 @@ end;
 
 function ISOTimeStampToDateTime(const dateTime: string): TDateTime;
 begin
-  if dateTime <> '' then
+  if ((dateTime <> '') and (dateTime <> 'null')) then
   begin
     Result := EncodeDateTime(StrToInt(Copy(dateTime, 1, 4)),
       StrToInt(Copy(dateTime, 6, 2)), StrToInt(Copy(dateTime, 9, 2)),
@@ -63,7 +63,7 @@ end;
 
 function ISODateToDate(const date: string): TDate;
 begin
-  if date <> '' then
+if ((date <> '') and (date <> 'null')) then
   begin
     Result := EncodeDate(StrToInt(Copy(date, 1, 4)),
       StrToInt(Copy(date, 6, 2)), StrToInt(Copy(date, 9, 2)));
