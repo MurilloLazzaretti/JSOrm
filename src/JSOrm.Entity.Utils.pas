@@ -55,7 +55,7 @@ begin
     Result := EncodeDateTime(StrToInt(Copy(dateTime, 1, 4)),
       StrToInt(Copy(dateTime, 6, 2)), StrToInt(Copy(dateTime, 9, 2)),
       StrToInt(Copy(dateTime, 12, 2)), StrToInt(Copy(dateTime, 15, 2)),
-      StrToInt(Copy(dateTime, 18, 2)), 0);
+      StrToInt(Copy(dateTime, 18, 2)), StrToInt(Copy(dateTime, 21, 3)));
   end
   else
     Result := 0;
@@ -63,7 +63,7 @@ end;
 
 function ISODateToDate(const date: string): TDate;
 begin
-if ((date <> '') and (date <> 'null')) then
+  if ((date <> '') and (date <> 'null')) then
   begin
     Result := EncodeDate(StrToInt(Copy(date, 1, 4)),
       StrToInt(Copy(date, 6, 2)), StrToInt(Copy(date, 9, 2)));
