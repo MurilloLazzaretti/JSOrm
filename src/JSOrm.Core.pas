@@ -52,7 +52,7 @@ end;
 
 class procedure TJSOrm.SetUserDB(const pUser: string);
 begin
-  JSOrm.Params.ConnectionParams.User := pPassword;
+  JSOrm.Params.ConnectionParams.User := pUser;
 end;
 
 class procedure TJSOrm.Start(const pIniFileName, pIniSection: string);
