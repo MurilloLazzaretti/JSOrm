@@ -10,6 +10,10 @@ type
     class procedure Start(const pIniFileName, pIniSection : string);
     class procedure Stop;
     class function Started : boolean;
+    class procedure SetPasswordDB(const pPassword: string);
+    class procedure SetUserDB(const pUser: string);
+    class procedure SetServerDB(const pServer: string);
+    class procedure SetDriverDB(const pDriver: string);
     class function TestDBConnection : boolean;
   end;
 
@@ -30,6 +34,26 @@ uses
   FireDAC.Phys.MSSQL, FireDAC.Phys.MSSQLDef;
 
 { TJSOrm }
+
+class procedure TJSOrm.SetDriverDB(const pDriver: string);
+begin
+  JSOrm.Params.ConnectionParams.Driver := pDriver;
+end;
+
+class procedure TJSOrm.SetPasswordDB(const pPassword: string);
+begin
+  JSOrm.Params.ConnectionParams.Password := pPassword;
+end;
+
+class procedure TJSOrm.SetServerDB(const pServer: string);
+begin
+  JSOrm.Params.ConnectionParams.Server := pServer;
+end;
+
+class procedure TJSOrm.SetUserDB(const pUser: string);
+begin
+  JSOrm.Params.ConnectionParams.User := pPassword;
+end;
 
 class procedure TJSOrm.Start(const pIniFileName, pIniSection: string);
 begin
