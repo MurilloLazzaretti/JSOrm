@@ -52,10 +52,18 @@ function ISOTimeStampToDateTime(const dateTime: string): TDateTime;
 begin
   if ((dateTime <> '') and (dateTime <> 'null')) then
   begin
-    Result := EncodeDateTime(StrToInt(Copy(dateTime, 1, 4)),
-      StrToInt(Copy(dateTime, 6, 2)), StrToInt(Copy(dateTime, 9, 2)),
-      StrToInt(Copy(dateTime, 12, 2)), StrToInt(Copy(dateTime, 15, 2)),
-      StrToInt(Copy(dateTime, 18, 2)), StrToInt(Copy(dateTime, 21, 3)));
+    try
+      //Date Time with miliseconds
+      Result := EncodeDateTime(StrToInt(Copy(dateTime, 1, 4)),
+        StrToInt(Copy(dateTime, 6, 2)), StrToInt(Copy(dateTime, 9, 2)),
+        StrToInt(Copy(dateTime, 12, 2)), StrToInt(Copy(dateTime, 15, 2)),
+        StrToInt(Copy(dateTime, 18, 2)), StrToInt(Copy(dateTime, 21, 3)));
+    except
+      //Date Time without miliseconds, default 0
+      Result := EncodeDateTime(StrToInt(Copy(dateTime, 1, 4)),
+        StrToInt(Copy(dateTime, 6, 2)), StrToInt(Copy(dateTime, 9, 2)),
+        StrToInt(Copy(dateTime, 12, 2)), StrToInt(Copy(dateTime, 15, 2)),
+        StrToInt(Copy(dateTime, 18, 2)), 0);
   end
   else
     Result := 0;
